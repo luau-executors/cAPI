@@ -37,7 +37,7 @@ title.TextXAlignment = Enum.TextXAlignment.Left -- Left-aligned text
 -- Subtitle ("Loaded")
 local subtitle = Instance.new("TextLabel", notification)
 subtitle.Name = "Subtitle"
-subtitle.Text = "Loaded"
+subtitle.Text = "Protections enabled."
 subtitle.TextColor3 = Color3.new(0.8, 0.8, 0.8) -- Light gray text
 subtitle.TextSize = 14
 subtitle.Font = Enum.Font.Gotham
