@@ -4,11 +4,35 @@ local cAPI = {
 }
 table.freeze(cAPI)
 
-print("Thank you for using the cAPI, currently running " .. cAPI.version)
+print("Thank you for using the cAPI fork based on CloudyAPI, currently running " .. cAPI.version)
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/getconnections.luau"))()
+local libs = {
+    {
+        ['name'] = "Getconnections",
+        ['url'] = "https://raw.githubusercontent.com/luau-executors/functions/refs/heads/main/getconnections.luau?token="
+    }
+}
 
-cenv = {}
+local function load_library(lib_name)
+    for _, lib in ipairs(libs) do
+        if lib.name == lib_name then
+            local response = request({ Url = lib.url, Method = "GET" })
+            if response.Success then
+                local func, err = loadstring(response.Body)
+                if not func then
+                    warn("Failed to load library " .. lib.name .. ": " .. err)
+                end
+                func()  -- Execute the library code
+                return true  -- Indicate success
+            else
+                warn("Failed to fetch library " .. lib.name .. ": " .. response.StatusCode)
+            end
+        end
+    end
+    warn("Library not found: " .. lib_name)
+end
+
+load_library("Getconnections")
 
 for idx, con in next, getconnections(game:GetService("LogService").MessageOut) do
      con:Disable()
