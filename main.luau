@@ -11,7 +11,7 @@ print("Thank you for using the cAPI fork based on CloudyAPI, currently running "
 local libs = {
     {
         ['name'] = "Getconnections",
-        ['url'] = "https://raw.githubusercontent.com/luau-executors/functions/refs/heads/main/getconnections.luau?token="
+        ['url'] = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/getconnections.luau?token=GHSAT0AAAAAAC7BVHG2S52TROIOFA7LZNIAZ6XJCBQ"
     }
 }
 
