@@ -44,7 +44,7 @@ getgenv().cAPI.Dex = function()
 end
 
 getgenv().getapicredits = function()
-	return "cAPI built by Ella, Sources used: MoreUNC functions, xAPI functions, Salad Functions"
+	print "cAPI built by Ella, Sources used: MoreUNC functions, xAPI functions, Salad Functions"
 end
 
 --[[
