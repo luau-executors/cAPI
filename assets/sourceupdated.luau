@@ -31,16 +31,46 @@ queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/lu
 
 getgenv().cAPI = {}
 
-getgenv().cAPI.iy = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+local function addGlobal(funcTable, overwrite)
+    if type(funcTable) ~= "table" then
+        error("addGlobal expects a table of functions", 2)
+    end
+
+    for funcName, func in pairs(funcTable) do
+        if type(func) == "function" then
+            if not overwrite and cAPI[funcName] ~= nil then
+                warn(`Skipping {funcName}: already exists in cAPI`)
+            else
+                cAPI[funcName] = func
+            end
+        else
+            warn(`Skipping {funcName}: not a function`)
+        end
+    end
 end
 
-getgenv().cAPI.SUNC = function()
-    loadstring(game:HttpGet("https://gitlab.com/sens3/nebunu/-/raw/main/HummingBird8's_sUNC_yes_i_moved_to_gitlab_because_my_github_acc_got_brickedd/sUNCm0m3n7.lua"))()
-end
+addGlobal({
+    iy = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+    end
+})
 
-getgenv().cAPI.Dex = function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
+-- Add SUNC function
+addGlobal({
+    SUNC = function()
+        loadstring(game:HttpGet("https://gitlab.com/sens3/nebunu/-/raw/main/HummingBird8's_sUNC_yes_i_moved_to_gitlab_because_my_github_acc_got_brickedd/sUNCm0m3n7.lua"))()
+    end
+})
+
+-- Add Dex function
+addGlobal({
+    Dex = function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
+    end
+})
+
+getgenv().getcenv = function()
+	return cAPI
 end
 
 getgenv().identifyexecutor = function()
@@ -65,6 +95,10 @@ getgenv().request = function(options)
 	local response = oldr(options)
 	return response
 end 
+--[[
+	Important Stuff (do not change)
+]]
+
 
 getgenv().cclosure = function(f)
     return coroutine.wrap(function(...)
