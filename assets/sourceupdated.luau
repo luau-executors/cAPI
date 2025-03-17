@@ -88,7 +88,7 @@ local function setreadonly(obj, value)
     if mt and type(mt) == "table" then
         if value == true then
             mt.__oldindex = mt.__newindex
-            mt.__newindex = _cclosure(function() error("attempt to modify a readonly table", 0) end)
+            mt.__newindex = cclosure(function() error("attempt to modify a readonly table", 0) end)
         else
             if mt.__oldindex then
                 mt.__newindex = mt.__oldindex
@@ -100,7 +100,7 @@ local function setreadonly(obj, value)
         end
     elseif not mt then
         setmetatable(obj, {
-            __newindex = _cclosure(function() error("attempt to modify a readonly table", 0) end),
+            __newindex = cclosure(function() error("attempt to modify a readonly table", 0) end),
             __readonly = true
         })
     else
