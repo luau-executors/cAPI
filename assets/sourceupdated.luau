@@ -7,6 +7,9 @@ table.freeze(API)
 
 local HttpService = game:GetService("HttpService")
 
+local function try(fn, ...)
+	return (pcall(fn, ...))
+end
 
 getgenv().DrawingLibrary = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/DrawingLib.luau"
 getgenv().Animation = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/slideout.luau"
@@ -28,15 +31,6 @@ queue_on_teleport("loadstring(game:HttpGet('https://raw.githubusercontent.com/lu
 
 getgenv().cAPI = {}
 
-getgenv().is_cAPI_closure = function(func)
-    for _, v in pairs(cAPI) do
-        if rawequal(v, func) then -- Use rawequal to prevent metatable issues
-            return true
-        end
-    end
-    return false
-end
-
 getgenv().cAPI.iy = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
 end
@@ -53,12 +47,13 @@ getgenv().identifyexecutor = function()
     return API.name, API.version
 end
 
+getgenv().executorname = identifyexecutor
+getgenv().whatexecutorname = identifyexecutor
+
+
 getgenv().httppost = function(URL, body, contenttype) 
     return game:HttpPostAsync(URL, body, contenttype)
 end
-
-getgenv().whatexecutorname = identifyexecutor
-getgenv().executorname = identifyexecutor
 
 local oldr = request 
 getgenv().request = function(options)
@@ -70,6 +65,89 @@ getgenv().request = function(options)
 	local response = oldr(options)
 	return response
 end 
+
+getgenv().cclosure = function(f)
+    return coroutine.wrap(function(...)
+        while true do
+            coroutine.yield(f(...))
+        end
+    end)
+end
+
+local function setreadonly(obj, value)
+    local mt = getmetatable(obj)
+    
+    if mt and type(mt) == "table" then
+        if value == true then
+            mt.__oldindex = mt.__newindex
+            mt.__newindex = _cclosure(function() error("attempt to modify a readonly table", 0) end)
+        else
+            if mt.__oldindex then
+                mt.__newindex = mt.__oldindex
+                mt.__oldindex = nil
+            elseif mt.__readonly then
+                mt.__newindex = nil
+                mt.__readonly = nil
+            end
+        end
+    elseif not mt then
+        setmetatable(obj, {
+            __newindex = _cclosure(function() error("attempt to modify a readonly table", 0) end),
+            __readonly = true
+        })
+    else
+        error("unable to safely freeze table")
+    end
+end
+
+getgenv().getthreadidentity = function()
+	local securityChecks = {
+		{
+			name = "None",
+			number = 0,
+			canAccess = try(function() return game.Name end)
+		},
+		{
+			name = "PluginSecurity",
+			number = 1,
+			canAccess = try(function() return game:GetService("CoreGui").Name end)
+		},
+		{
+			name = "LocalUserSecurity",
+			number = 3,
+			canAccess = try(function() return game.DataCost end)
+		},
+		{
+			name = "WritePlayerSecurity",
+			number = 4,
+			canAccess = try(Instance.new, "Player")
+		},
+		{
+			name = "RobloxScriptSecurity",
+			number = 5,
+			canAccess = try(function() return game:GetService("CorePackages").Name end)
+		},
+		{
+			name = "RobloxSecurity",
+			number = 6,
+			canAccess = try(function() return Instance.new("SurfaceAppearance").TexturePack end)
+		},
+		{
+			name = "NotAccessibleSecurity",
+			number = 7,
+			canAccess = try(function() Instance.new("MeshPart").MeshId = "" end)
+		}
+	}
+	local lasti = 1
+	for i = 1, #securityChecks do
+		if securityChecks[i].canAccess then
+			lasti = i
+		else
+			return lasti
+		end
+	end
+	return lasti
+end
 
 --[[
     Version Checking
