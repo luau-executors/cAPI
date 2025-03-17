@@ -98,6 +98,42 @@ getgenv().type_check = function(argument_position: number, value: any, allowed_t
 	return value
 end
 
+getgenv().hookmetamethod = function(obj, method, hook)
+    assert(type(obj) == "table" or type(obj) == "userdata", "Argument #1 (obj) must be a table or userdata")
+    assert(type(method) == "string", "Argument #2 (method) must be a string")
+    assert(type(hook) == "function", "Argument #3 (hook) must be a function")
+
+    local mt = getmetatable(obj)
+    if not mt then
+        error("Cannot hook metamethod: object has no metatable", 2)
+    end
+
+    -- Check if the metamethod exists and is a function
+    local original = mt[method]
+    if not original or type(original) ~= "function" then
+        error(`Cannot hook metamethod: '{method}' is not a function in the metatable`, 2)
+    end
+
+    -- Check if the metatable is writable
+    local is_writable = pcall(function()
+        mt[method] = hook
+    end)
+
+    if is_writable then
+        return original
+    else
+        local old_environment = getfenv(original)
+        local is_hookable = pcall(setfenv, original, old_environment)
+
+        if is_hookable then
+            return hookfunction(original, hook, old_environment)
+        else
+            warn(`Unable to hook metamethod '{method}': metatable is not writable and function is not hookable`)
+            return nil
+        end
+    end
+end
+
 getgenv().cclosure = function(f)
     return coroutine.wrap(function(...)
         while true do
@@ -182,7 +218,28 @@ getgenv().getthreadidentity = function()
 end
 
 --[[
-    Version Checking
+    Security Modules
 ]]
+
+local libs = {
+    {
+        ['name'] = "Security",
+        ['url'] = "http://luau-executors.github.io/assets/Security.luau"
+    }
+}
+
+local function load_lib(libName)
+    for _, lib in ipairs(libs) do
+        if lib.name == libName then
+            local response = game:HttpGet(lib.url)
+            return loadstring(response)()
+        end
+    end
+    warn("Library '" .. libName .. "' not found")
+    return nil
+end
+
+load_lib("Security")
+
 
 print("This instance is protected by " .. API.name, API.version)
