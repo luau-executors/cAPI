@@ -11,8 +11,8 @@ local function try(fn, ...)
 	return (pcall(fn, ...))
 end
 
-getgenv().DrawingLibrary = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/DrawingLib.luau"
-getgenv().Animation = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/slideout.luau"
+DrawingLibrary = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/DrawingLib.luau"
+LoadingAnimation = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/heads/main/slideout.luau"
 
 print("✅ Thank you for using the cAPI fork based on CloudyAPI, currently running " .. API.version)
 
@@ -43,9 +43,13 @@ getgenv().cAPI.Dex = function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/Babyhamsta/RBLX_Scripts/main/Universal/BypassedDarkDexV3.lua", true))()
 end
 
-getgenv().getcredits = function()
+getgenv().getapicredits = function()
 	return "cAPI built by Ella, Sources used: MoreUNC functions, xAPI functions, Salad Functions"
 end
+
+--[[
+	Identification
+]]
 
 getgenv().identifyexecutor = function()
     return API.name, API.version
@@ -53,11 +57,6 @@ end
 
 getgenv().executorname = identifyexecutor
 getgenv().whatexecutorname = identifyexecutor
-
-
-getgenv().httppost = function(URL, body, contenttype) 
-    return game:HttpPostAsync(URL, body, contenttype)
-end
 
 local oldr = request 
 getgenv().request = function(options)
@@ -69,10 +68,47 @@ getgenv().request = function(options)
 	local response = oldr(options)
 	return response
 end 
+
+--[[
+	Http Stuff
+]]
+
+
+getgenv().httppost = function(URL, body, contenttype) 
+    return game:HttpPostAsync(URL, body, contenttype)
+end
+
 --[[
 	Important Stuff (do not change)
 ]]
 
+getgenv().type_check = function(argument_position: number, value: any, allowed_types: {any}, optional: boolean?)
+	local formatted_arguments = table.concat(allowed_types, " or ")
+
+	if value == nil and not optional and not table.find(allowed_types, "nil") then
+		error(("missing argument #%d (expected %s)"):format(argument_position, formatted_arguments), 0)
+	elseif value == nil and optional == true then
+		return value
+	end
+
+	if not (table.find(allowed_types, typeof(value)) or table.find(allowed_types, type(value)) or table.find(allowed_types, value)) and not table.find(allowed_types, "any") then
+		error(("invalid argument #%d (expected %s, got %s)"):format(argument_position, formatted_arguments, typeof(value)), 0)
+	end
+
+	return value
+end
+
+getgenv().run_on_actor = function(actor, func)
+    if type(func) ~= "function" then
+        error("run_on_actor expects a function as the second argument", 2)
+    end
+
+    if actor and actor:IsA("Model") and actor:FindFirstChild("Humanoid") then
+        func(actor) -- Execute the function on the actor
+    else
+        warn("Invalid actor provided to run_on_actor")
+    end
+end
 
 getgenv().cclosure = function(f)
     return coroutine.wrap(function(...)
