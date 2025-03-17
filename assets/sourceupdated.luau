@@ -17,7 +17,7 @@ LoadingAnimation = "https://raw.githubusercontent.com/luau-executors/cAPI/refs/h
 print("✅ Thank you for using the cAPI fork based on CloudyAPI, currently running " .. API.version)
 
 loadstring(game:HttpGet(DrawingLibrary))()
-loadstring(game:HttpGet(Animation))()
+loadstring(game:HttpGet(LoadingAnimation))()
 
 for idx, con in next, getconnections(game:GetService("LogService").MessageOut) do
      con:Disable()
@@ -44,7 +44,7 @@ getgenv().cAPI.Dex = function()
 end
 
 getgenv().getapicredits = function()
-	print "cAPI built by Ella, Sources used: MoreUNC functions, xAPI functions, Salad Functions"
+	return "cAPI built by Ella, Sources used: MoreUNC functions, xAPI functions, Salad Functions"
 end
 
 --[[
@@ -223,7 +223,7 @@ end
 
 local libs = {
     {
-        ['name'] = "Security",
+        ['name'] = "Environment Wrapper",
         ['url'] = "http://luau-executors.github.io/assets/Security.luau"
     }
 }
@@ -239,7 +239,7 @@ local function load_lib(libName)
     return nil
 end
 
-load_lib("Security")
+load_lib("Environment Wrapper")
 
 
 print("This instance is protected by " .. API.name, API.version)
