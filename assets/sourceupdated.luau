@@ -98,52 +98,6 @@ getgenv().type_check = function(argument_position: number, value: any, allowed_t
 	return value
 end
 
-getgenv().run_on_actor = function(actor, func)
-    if type(func) ~= "function" then
-        error("run_on_actor expects a function as the second argument", 2)
-    end
-
-    if actor and actor:IsA("Model") and actor:FindFirstChild("Humanoid") then
-        func(actor) -- Execute the function on the actor
-    else
-        warn("Invalid actor provided to run_on_actor")
-    end
-end
-
-local function hookmetamethod(obj, method, hook) -- xAPI source, refined function
-    assert(type(obj) == "table" or type(obj) == "userdata", "Argument #1 (obj) must be a table or userdata")
-    assert(type(method) == "string", "Argument #2 (method) must be a string")
-    assert(type(hook) == "function", "Argument #3 (hook) must be a function")
-
-    local mt = getmetatable(obj)
-    if not mt then
-        error("Cannot hook metamethod: object has no metatable", 2)
-    end
-
-    local original = rawget(mt, method)
-    if not original or type(original) ~= "function" then
-        error(`Cannot hook metamethod: '{method}' is not a function in the metatable`, 2)
-    end
-
-    local is_writable = pcall(function()
-        mt[method] = hook
-    end)
-
-    if is_writable then
-        return original
-    else
-        local old_environment = getfenv(original)
-        local is_hookable = pcall(setfenv, original, old_environment)
-
-        if is_hookable then
-            return hookfunction(original, hook, old_environment)
-        else
-            warn(`Unable to hook metamethod '{method}': metatable is not writable and function is not hookable`)
-            return nil
-        end
-    end
-end
-
 getgenv().cclosure = function(f)
     return coroutine.wrap(function(...)
         while true do
