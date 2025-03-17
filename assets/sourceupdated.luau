@@ -53,6 +53,10 @@ getgenv().identifyexecutor = function()
     return API.name, API.version
 end
 
+getgenv().httppost = function(URL, body, contenttype) 
+    return game:HttpPostAsync(URL, body, contenttype)
+end
+
 getgenv().whatexecutorname = identifyexecutor
 getgenv().executorname = identifyexecutor
 
